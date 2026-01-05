@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rizq Tasbih</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f766e">
+<style>
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: system-ui, Arial, sans-serif;
+  background: linear-gradient(135deg, #0f766e, #022c22);
+  color: #ecfeff;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 25px;
+  color: #a7f3d0;
+}
+
+.tasbih-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.dua-ar {
+  font-size: 20px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.dua-translit {
+  font-size: 14px;
+  font-style: italic;
+  color: #ccfbf1;
+  margin-bottom: 6px;
+}
+
+.dua-meaning {
+  font-size: 14px;
+  color: #99f6e4;
+  margin-bottom: 15px;
+}
+
+.counter {
+  font-size: 26px;
+  margin: 10px 0;
+  color: #ecfeff;
+}
+
+.target {
+  font-size: 14px;
+  color: #ccfbf1;
+  margin-bottom: 10px;
+}
+
+.target input {
+  width: 80px;
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+}
+
+.bead {
+  width: 140px;
+  height: 140px;
+  margin: 15px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #5eead4, #0f766e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #022c22;
+  user-select: none;
+}
+
+.bead:active {
+  transform: scale(0.94);
+}
+
+.reset-btn {
+  margin-top: 12px;
+  background: #134e4a;
+  color: #ccfbf1;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+<body>
+
+<h1>📿 Rizq Tasbih</h1>
+
+<div id="app"></div>
+
+<script>
+const duas = [
+  {
+    id: "dua1",
+    ar: "اللهم اكفني بحلالك عن حرامك واغنني برحمتك عمن سواك",
+    tr: "Allahumma-kfini bihalalika ‘an haramika wa aghnini birahmatika ‘amman siwaka",
+    en: "O Allah, suffice me with what You have made lawful against what You have forbidden, and make me independent of all others besides You."
+  },
+  {
+    id: "dua2",
+    ar: "حسبنا الله سيؤتينا الله من فضله إنا إلى الله راغبون",
+    tr: "Hasbunallahu sayu’tinallahu min fadlihi inna ilallahi raghibun",
+    en: "Allah is sufficient for us. Allah will give us from His bounty. Indeed, we turn to Allah alone with hope."
+  },
+  {
+    id: "dua3",
+    ar: "ربنا إني لما أنزلت إليّ من خير فقير",
+    tr: "Rabbani inni lima anzalta ilayya min khayrin faqir",
+    en: "My Lord, indeed I am in need of whatever good You send down to me."
+  }
+];
+
+const app = document.getElementById("app");
+
+duas.forEach(dua => {
+  const countKey = dua.id + "_count";
+  const targetKey = dua.id + "_target";
+
+  let count = parseInt(localStorage.getItem(countKey)) || 0;
+  let target = parseInt(localStorage.getItem(targetKey)) || 100;
+
+  const card = document.createElement("div");
+  card.className = "tasbih-card";
+
+  card.innerHTML = `
+    <div class="dua-ar">${dua.ar}</div>
+    <div class="dua-translit">${dua.tr}</div>
+    <div class="dua-meaning">${dua.en}</div>
+
+    <div class="counter">Count: <span id="${countKey}">${count}</span></div>
+
+    <div class="target">
+      Target:
+      <input type="number" id="${targetKey}" value="${target}">
+    </div>
+
+    <div class="bead" id="${dua.id}_bead">Tap</div>
+
+    <button class="reset-btn" id="${dua.id}_reset">Reset</button>
+  `;
+
+  app.appendChild(card);
+
+  const countSpan = document.getElementById(countKey);
+  const bead = document.getElementById(dua.id + "_bead");
+  const targetInput = document.getElementById(targetKey);
+  const resetBtn = document.getElementById(dua.id + "_reset");
+
+  bead.addEventListener("click", () => {
+    count++;
+    countSpan.textContent = count;
+    localStorage.setItem(countKey, count);
+    if (navigator.vibrate) navigator.vibrate(40);
+  });
+
+  resetBtn.addEventListener("click", () => {
+    if (confirm("Reset this count?")) {
+      count = 0;
+      countSpan.textContent = count;
+      localStorage.setItem(countKey, count);
+    }
+  });
+
+  targetInput.addEventListener("change", () => {
+    localStorage.setItem(targetKey, targetInput.value);
+  });
+});
+</script>
+
+</body>
+</html>
